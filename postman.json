@@ -1,0 +1,141 @@
+{
+	"info": {
+		"_postman_id": "b3e3e1f0-8c29-4d6d-9d41-e19c72dfb7e9",
+		"name": "SplitStack API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Create User",
+			"request": {
+				"method": "POST",
+				"header": [
+					{ "key": "Authorization", "value": "Bearer dev-secret-key" },
+					{ "key": "Content-Type", "value": "application/json" }
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Alice\",\n    \"email\": \"alice@example.com\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/users",
+					"protocol": "http",
+					"host": [ "localhost" ],
+					"port": "8080",
+					"path": [ "users" ]
+				}
+			}
+		},
+		{
+			"name": "Create Group",
+			"request": {
+				"method": "POST",
+				"header": [
+					{ "key": "Authorization", "value": "Bearer dev-secret-key" },
+					{ "key": "Content-Type", "value": "application/json" }
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Weekend Trip\",\n    \"currency\": \"USD\",\n    \"memberUserIds\": [\n        \"{{user1_id}}\",\n        \"{{user2_id}}\"\n    ]\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/groups",
+					"protocol": "http",
+					"host": [ "localhost" ],
+					"port": "8080",
+					"path": [ "groups" ]
+				}
+			}
+		},
+		{
+			"name": "Add Expense",
+			"request": {
+				"method": "POST",
+				"header": [
+					{ "key": "Authorization", "value": "Bearer dev-secret-key" },
+					{ "key": "Content-Type", "value": "application/json" }
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"description\": \"Dinner\",\n    \"totalAmountCents\": 10000,\n    \"currency\": \"USD\",\n    \"paidByUserId\": \"{{user1_id}}\",\n    \"splits\": []\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/groups/{{group_id}}/expenses",
+					"protocol": "http",
+					"host": [ "localhost" ],
+					"port": "8080",
+					"path": [ "groups", "{{group_id}}", "expenses" ]
+				}
+			}
+		},
+		{
+			"name": "Record Settlement",
+			"request": {
+				"method": "POST",
+				"header": [
+					{ "key": "Authorization", "value": "Bearer dev-secret-key" },
+					{ "key": "Content-Type", "value": "application/json" }
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"fromUserId\": \"{{user2_id}}\",\n    \"toUserId\": \"{{user1_id}}\",\n    \"amountCents\": 5000\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/groups/{{group_id}}/settlements",
+					"protocol": "http",
+					"host": [ "localhost" ],
+					"port": "8080",
+					"path": [ "groups", "{{group_id}}", "settlements" ]
+				}
+			}
+		},
+		{
+			"name": "Get Balances",
+			"request": {
+				"method": "GET",
+				"header": [
+					{ "key": "Authorization", "value": "Bearer dev-secret-key" }
+				],
+				"url": {
+					"raw": "http://localhost:8080/groups/{{group_id}}/balances",
+					"protocol": "http",
+					"host": [ "localhost" ],
+					"port": "8080",
+					"path": [ "groups", "{{group_id}}", "balances" ]
+				}
+			}
+		},
+		{
+			"name": "Get Verified Balances",
+			"request": {
+				"method": "GET",
+				"header": [
+					{ "key": "Authorization", "value": "Bearer dev-secret-key" }
+				],
+				"url": {
+					"raw": "http://localhost:8080/groups/{{group_id}}/balances/verified",
+					"protocol": "http",
+					"host": [ "localhost" ],
+					"port": "8080",
+					"path": [ "groups", "{{group_id}}", "balances", "verified" ]
+				}
+			}
+		},
+		{
+			"name": "Get Settlement Plan",
+			"request": {
+				"method": "GET",
+				"header": [
+					{ "key": "Authorization", "value": "Bearer dev-secret-key" }
+				],
+				"url": {
+					"raw": "http://localhost:8080/groups/{{group_id}}/settlement-plan",
+					"protocol": "http",
+					"host": [ "localhost" ],
+					"port": "8080",
+					"path": [ "groups", "{{group_id}}", "settlement-plan" ]
+				}
+			}
+		}
+	]
+}
