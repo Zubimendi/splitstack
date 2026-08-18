@@ -137,18 +137,17 @@ and it's exactly the kind of small thing that separates a project you can
 defend clearly in an interview from one where a sharp follow-up question
 ("is that actually the minimum?") has no good answer.
 
-### What's honestly not done
+### What's next (v2)
 
-There's no authentication anywhere yet — every endpoint is reachable by
-anyone who can reach the API, named plainly as a real gap rather than
-discovered by someone reading the handler code and wondering where the
-auth middleware went. There's no multi-currency conversion, despite
-`currency` fields existing on both groups and expenses. The ledger is
-append-only by design — correcting a mistake means recording an
-offsetting entry, not editing history, matching the philosophy of this
-project's closest sibling, LedgerLine. All of it is written down as a
-deliberate v1 boundary, not discovered later by someone wondering why
-it's missing.
+With the core MVP stabilization complete, the boundaries for v2 are explicit.
+While basic API-key authentication secures the service today, full user-level
+JWT authorization is slated for the next cycle. Multi-currency conversion
+(beyond enforcing that expenses strictly match their group's currency) is
+also pushed to v2. The ledger is append-only by design — correcting a mistake
+means recording an offsetting entry, not editing history. Tooling to automate
+these offsetting entries will arrive in a future update. All of these are
+written down as deliberate boundaries, so they aren't discovered later by
+someone wondering why they're missing.
 
 ### Conclusion: the hard part was never the arithmetic
 
@@ -190,10 +189,10 @@ and totals wrapped around them.
    agreeing after every write in a realistic sequence) as the concrete,
    verifiable claim backing the cache-is-not-source-of-truth design — not
    a vague assurance that "the cache stays in sync."
-5. **Be upfront about what's missing.** "There's no auth yet, and that's
-   named explicitly as the next real blocker, not something I'm hoping
-   nobody notices" is a stronger answer than pretending the project is
-   further along than it is.
+5. **Be upfront about what's pushed to v2.** "We stabilized the MVP with
+   API key authentication and strict currency enforcement, but left user-level
+   auth and multi-currency conversion to the next cycle" is a stronger answer
+   than pretending the project has features it doesn't.
 
 ## Suggested post formats
 
@@ -216,6 +215,6 @@ Before It's a Math Problem* → the part everyone gets right vs. the two
 parts nobody proves → the cache-vs-verified-balance split → two
 invariants that look alike but aren't (and why they need different
 mechanisms) → being honest about what "optimal" doesn't mean in the
-settlement algorithm → what's honestly not built yet → conclusion.
+settlement algorithm → explicit boundaries for v2 → conclusion.
 `ARCHITECTURE.md` §1–2 and §7 can be lifted almost directly into the
 technical middle of the article.

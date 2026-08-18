@@ -121,9 +121,9 @@ deliberately.
   design is built around. See `docs/TESTING.md` for exactly what each
   test needs to prove — right now that document describes the *intended*
   test suite, not an existing one.
-- **No authentication or authorization anywhere.** Flagged in
-  `docs/PRD.md` and `docs/ARCHITECTURE.md` as a real gap, not a
-  formality — every handler is currently reachable by anyone.
+- **User-level authorization is pending.** API-key authentication secures the
+  service today, but full user-based authorization (e.g., JWT) is pushed to v2.
+  Flagged in `docs/PRD.md` and `docs/ARCHITECTURE.md` as a real gap before launch.
 
 ## Design decisions already made — don't relitigate without reason
 
@@ -176,8 +176,8 @@ deliberately.
    conflict handling, idempotency-key replay, the deferred-trigger
    violation, and — the most important one — cached-vs-verified-balance
    agreement across a realistic sequence of writes.
-8. Authentication. Not optional before this is anything but a portfolio
-   piece.
+8. User-level authorization. API key secures the app now, but full multi-tenant
+   auth is required before consumer release.
 
 ## How to give a fresh agent session everything it needs
 

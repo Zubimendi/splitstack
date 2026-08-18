@@ -10,9 +10,7 @@ func AuthMiddleware(expectedKey string) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if expectedKey == "" {
-				// If no key is set in config, allow traffic (fail-open or disable auth for local dev if chosen).
-				// For a strict MVP, this should probably still require a key, but we'll check it here.
-				next.ServeHTTP(w, r)
+				writeError(w, http.StatusInternalServerError, "AUTH_NOT_CONFIGURED", "server is not configured with an API key")
 				return
 			}
 

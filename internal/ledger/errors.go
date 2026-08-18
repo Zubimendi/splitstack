@@ -20,4 +20,7 @@ var (
 
 	// ErrIdempotencyMismatch is returned when an idempotency key is reused but the payload differs from the original request.
 	ErrIdempotencyMismatch = errors.New("idempotency key reused with a different payload")
+
+	// ErrCurrencyMismatch is returned when an expense or settlement currency does not match the group's currency.
+	ErrCurrencyMismatch = errors.New("currency must match group currency")
 )

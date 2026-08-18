@@ -91,6 +91,16 @@ func computePayloadHash(payload interface{}) string {
 
 func (e *Engine) AddExpense(ctx context.Context, input AddExpenseInput) (Expense, error) {
 	// First, lookup group members to validate splits and compute even split if needed
+	var groupCurrency string
+	err := e.db.QueryRow(ctx, `SELECT currency FROM groups WHERE id = $1`, input.GroupID).Scan(&groupCurrency)
+	if err != nil {
+		return Expense{}, ErrNotFound
+	}
+	if input.Currency != "" && input.Currency != groupCurrency {
+		return Expense{}, ErrCurrencyMismatch
+	}
+	input.Currency = groupCurrency
+
 	rows, err := e.db.Query(ctx, `SELECT user_id FROM group_members WHERE group_id = $1`, input.GroupID)
 	if err != nil {
 		return Expense{}, err

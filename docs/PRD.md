@@ -64,22 +64,17 @@ unproven claim of optimality.
 
 ## Explicit non-goals for v1
 
-- **No multi-currency conversion.** A group and its expenses each carry a
-  `currency` field, but there is no FX-rate lookup or cross-currency
-  settlement math — a group is assumed to operate in one currency for
-  balance purposes, and the field exists for display/record-keeping, not
-  conversion.
+- **No multi-currency conversion.** Expenses must strictly match their
+  group's currency, preventing silent bugs without requiring complex FX math.
+  Automatic conversion is slated for v2.
 - **No editing or deleting past expenses or settlements.** The ledger is
   append-only, matching LedgerLine's philosophy — correcting a mistake
-  means recording an offsetting entry, not mutating history. A "void this
-  expense" flow is plausible future work, not in v1.
+  means recording an offsetting entry, not mutating history. Tooling to
+  automate these offsetting entries is slated for v2.
 - **No recurring expenses, receipt attachments, or notifications.** Pure
   ledger-and-settlement logic, not a full consumer product.
-- **No authentication or authorization in v1.** Every endpoint is
-  currently reachable by anyone who can reach the API — a deliberate,
-  clearly-flagged gap (see `docs/CURSOR_CONTEXT.md`), not something to
-  discover by reading the handler code and wondering why there's no auth
-  middleware.
+- **API-key authentication only.** The API is secured via a strict
+  API key, but user-level authorization (e.g., JWT) is deferred to v2.
 - **No provably-optimal debt simplification.** The true minimum-
   transaction-count version of this problem is equivalent to a
   partition/subset-sum problem and is NP-hard in general; an exhaustive
@@ -115,9 +110,9 @@ unproven claim of optimality.
 
 ## Named risks / open questions
 
-- **No auth is a real production blocker, not a cosmetic gap.** Flagged
-  explicitly rather than left implicit — see `docs/CURSOR_CONTEXT.md`'s
-  next-priorities list.
+- **User-level authorization is pending.** Basic API key secures the service,
+  but proper multi-tenant authorization is a real blocker before consumer launch.
+  Flagged explicitly — see `docs/CURSOR_CONTEXT.md`'s next-priorities list.
 - **Optimistic-lock retry storms under high contention.** A group with
   many members adding expenses simultaneously could see a meaningful
   retry rate on `group_balances` writes; v1 doesn't yet cap or back off

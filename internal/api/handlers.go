@@ -158,6 +158,8 @@ func (h *Handlers) GetSettlementPlan(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handlers) respondExpenseError(w http.ResponseWriter, err error) {
 	switch {
+	case errors.Is(err, ledger.ErrCurrencyMismatch):
+		writeError(w, http.StatusBadRequest, "CURRENCY_MISMATCH", err.Error())
 	case errors.Is(err, ledger.ErrSplitsDontSum):
 		writeError(w, http.StatusUnprocessableEntity, "SPLITS_DONT_SUM", err.Error())
 	case errors.Is(err, ledger.ErrNotGroupMember):

@@ -215,20 +215,18 @@ unexpected (`Handlers`' `default` error branch), not `fmt.Println`, and
 `observability.MetricsHandler()` exposes everything at `/metrics` via
 `promhttp`.
 
-## What's deliberately simplified for a v1 reference implementation
+## Explicit boundaries for v2
 
 Full detail and next steps are in `docs/CURSOR_CONTEXT.md`:
 
-- **No authentication or authorization anywhere yet.** Every endpoint is
-  reachable by anyone who can reach the API — this is a real gap to close
-  before this is anything but a portfolio piece, not a cosmetic omission,
-  and it's named plainly rather than left for someone to notice by
-  reading the handler code.
-- **No multi-currency conversion**, despite `currency` fields existing on
-  both `groups` and `expenses` — see `docs/PRD.md`'s non-goals.
+- **API-key authentication is strict, but user-level authorization is pending.**
+  The service is secured via basic auth, but tying expenses to specific
+  user tokens is pushed to v2.
+- **Strict currency matching, no multi-currency conversion.** Expenses must
+  match the group currency. Automatic conversion is deferred.
 - **The ledger is append-only; there is no edit or delete for expenses or
   settlements.** Correcting a mistake means recording an offsetting
-  entry, matching LedgerLine's philosophy, not mutating history.
+  entry. Tooling to automate this is slated for v2.
 - **The greedy settlement algorithm is not provably minimal** — a
   documented, deliberate trade-off (§7), not a bug.
 - **No explicit backoff or retry cap is implemented yet for optimistic-
