@@ -24,7 +24,12 @@ func NewRouter(h *Handlers, cfg config.Config) *chi.Mux {
 		r.Use(AuthMiddleware(cfg.APIKey))
 
 		r.Post("/users", h.CreateUser)
+		r.Get("/users", h.GetUsers)
+		r.Get("/users/{userId}", h.GetUser)
+		
 		r.Post("/groups", h.CreateGroup)
+		r.Get("/groups", h.GetGroups)
+		r.Get("/groups/{groupId}", h.GetGroup)
 		r.Post("/groups/{groupId}/expenses", h.AddExpense)
 		r.Post("/groups/{groupId}/settlements", h.RecordSettlement)
 		r.Get("/groups/{groupId}/balances", h.GetBalances)

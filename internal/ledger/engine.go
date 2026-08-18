@@ -35,6 +35,36 @@ func (e *Engine) CreateUser(ctx context.Context, name, email string) (User, erro
 	return u, nil
 }
 
+func (e *Engine) GetUsers(ctx context.Context) ([]User, error) {
+	rows, err := e.db.Query(ctx, `SELECT id, name, email FROM users`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var users []User
+	for rows.Next() {
+		var u User
+		if err := rows.Scan(&u.ID, &u.Name, &u.Email); err != nil {
+			return nil, err
+		}
+		users = append(users, u)
+	}
+	return users, nil
+}
+
+func (e *Engine) GetUser(ctx context.Context, userID string) (User, error) {
+	var u User
+	err := e.db.QueryRow(ctx, `SELECT id, name, email FROM users WHERE id = $1`, userID).Scan(&u.ID, &u.Name, &u.Email)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return User{}, ErrNotFound
+		}
+		return User{}, err
+	}
+	return u, nil
+}
+
 func (e *Engine) CreateGroup(ctx context.Context, name, currency string, memberUserIDs []string) (Group, error) {
 	tx, err := e.db.Begin(ctx)
 	if err != nil {
@@ -72,6 +102,36 @@ func (e *Engine) CreateGroup(ctx context.Context, name, currency string, memberU
 		return Group{}, err
 	}
 
+	return g, nil
+}
+
+func (e *Engine) GetGroups(ctx context.Context) ([]Group, error) {
+	rows, err := e.db.Query(ctx, `SELECT id, name, currency FROM groups`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var groups []Group
+	for rows.Next() {
+		var g Group
+		if err := rows.Scan(&g.ID, &g.Name, &g.Currency); err != nil {
+			return nil, err
+		}
+		groups = append(groups, g)
+	}
+	return groups, nil
+}
+
+func (e *Engine) GetGroup(ctx context.Context, groupID string) (Group, error) {
+	var g Group
+	err := e.db.QueryRow(ctx, `SELECT id, name, currency FROM groups WHERE id = $1`, groupID).Scan(&g.ID, &g.Name, &g.Currency)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return Group{}, ErrNotFound
+		}
+		return Group{}, err
+	}
 	return g, nil
 }
 

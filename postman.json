@@ -27,6 +27,38 @@
 			}
 		},
 		{
+			"name": "Get Users",
+			"request": {
+				"method": "GET",
+				"header": [
+					{ "key": "Authorization", "value": "Bearer dev-secret-key" }
+				],
+				"url": {
+					"raw": "http://localhost:8080/users",
+					"protocol": "http",
+					"host": [ "localhost" ],
+					"port": "8080",
+					"path": [ "users" ]
+				}
+			}
+		},
+		{
+			"name": "Get User",
+			"request": {
+				"method": "GET",
+				"header": [
+					{ "key": "Authorization", "value": "Bearer dev-secret-key" }
+				],
+				"url": {
+					"raw": "http://localhost:8080/users/{{user1_id}}",
+					"protocol": "http",
+					"host": [ "localhost" ],
+					"port": "8080",
+					"path": [ "users", "{{user1_id}}" ]
+				}
+			}
+		},
+		{
 			"name": "Create Group",
 			"request": {
 				"method": "POST",
@@ -44,6 +76,38 @@
 					"host": [ "localhost" ],
 					"port": "8080",
 					"path": [ "groups" ]
+				}
+			}
+		},
+		{
+			"name": "Get Groups",
+			"request": {
+				"method": "GET",
+				"header": [
+					{ "key": "Authorization", "value": "Bearer dev-secret-key" }
+				],
+				"url": {
+					"raw": "http://localhost:8080/groups",
+					"protocol": "http",
+					"host": [ "localhost" ],
+					"port": "8080",
+					"path": [ "groups" ]
+				}
+			}
+		},
+		{
+			"name": "Get Group",
+			"request": {
+				"method": "GET",
+				"header": [
+					{ "key": "Authorization", "value": "Bearer dev-secret-key" }
+				],
+				"url": {
+					"raw": "http://localhost:8080/groups/{{group_id}}",
+					"protocol": "http",
+					"host": [ "localhost" ],
+					"port": "8080",
+					"path": [ "groups", "{{group_id}}" ]
 				}
 			}
 		},

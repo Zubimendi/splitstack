@@ -35,6 +35,25 @@ func (h *Handlers) CreateUser(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusCreated, user)
 }
 
+func (h *Handlers) GetUsers(w http.ResponseWriter, r *http.Request) {
+	users, err := h.engine.GetUsers(r.Context())
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, "INTERNAL_ERROR", "failed to fetch users")
+		return
+	}
+	writeJSON(w, http.StatusOK, users)
+}
+
+func (h *Handlers) GetUser(w http.ResponseWriter, r *http.Request) {
+	userID := chi.URLParam(r, "userId")
+	user, err := h.engine.GetUser(r.Context(), userID)
+	if err != nil {
+		h.respondExpenseError(w, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, user)
+}
+
 func (h *Handlers) CreateGroup(w http.ResponseWriter, r *http.Request) {
 	var req createGroupRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil || req.Name == "" || len(req.MemberUserIDs) == 0 {
@@ -51,6 +70,25 @@ func (h *Handlers) CreateGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeJSON(w, http.StatusCreated, group)
+}
+
+func (h *Handlers) GetGroups(w http.ResponseWriter, r *http.Request) {
+	groups, err := h.engine.GetGroups(r.Context())
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, "INTERNAL_ERROR", "failed to fetch groups")
+		return
+	}
+	writeJSON(w, http.StatusOK, groups)
+}
+
+func (h *Handlers) GetGroup(w http.ResponseWriter, r *http.Request) {
+	groupID := chi.URLParam(r, "groupId")
+	group, err := h.engine.GetGroup(r.Context(), groupID)
+	if err != nil {
+		h.respondExpenseError(w, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, group)
 }
 
 func (h *Handlers) AddExpense(w http.ResponseWriter, r *http.Request) {
