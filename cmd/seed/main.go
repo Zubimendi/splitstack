@@ -29,9 +29,9 @@ func main() {
 
 	fmt.Println("Seeding data...")
 
-	u1, _ := engine.CreateUser(ctx, "Alice", "alice@example.com")
-	u2, _ := engine.CreateUser(ctx, "Bob", "bob@example.com")
-	u3, _ := engine.CreateUser(ctx, "Charlie", "charlie@example.com")
+	u1, _ := engine.CreateUser(ctx, "Alice", "alice@example.com", "password123")
+	u2, _ := engine.CreateUser(ctx, "Bob", "bob@example.com", "password123")
+	u3, _ := engine.CreateUser(ctx, "Charlie", "charlie@example.com", "password123")
 
 	g, _ := engine.CreateGroup(ctx, "Weekend Trip", "USD", []string{u1.ID, u2.ID, u3.ID})
 

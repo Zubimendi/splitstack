@@ -1,19 +1,17 @@
 package api
 
 import (
+	"context"
 	"net/http"
 	"strings"
+
+	"github.com/golang-jwt/jwt/v5"
 )
 
-// AuthMiddleware requires a simple fixed token (Bearer <API_KEY>) to protect MVP routes.
-func AuthMiddleware(expectedKey string) func(http.Handler) http.Handler {
+// JWTAuthMiddleware requires a valid JWT token.
+func JWTAuthMiddleware(secretKey []byte) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if expectedKey == "" {
-				writeError(w, http.StatusInternalServerError, "AUTH_NOT_CONFIGURED", "server is not configured with an API key")
-				return
-			}
-
 			authHeader := r.Header.Get("Authorization")
 			if authHeader == "" {
 				writeError(w, http.StatusUnauthorized, "UNAUTHORIZED", "missing authorization header")
@@ -21,12 +19,28 @@ func AuthMiddleware(expectedKey string) func(http.Handler) http.Handler {
 			}
 
 			parts := strings.Split(authHeader, " ")
-			if len(parts) != 2 || parts[0] != "Bearer" || parts[1] != expectedKey {
-				writeError(w, http.StatusUnauthorized, "UNAUTHORIZED", "invalid or missing bearer token")
+			if len(parts) != 2 || parts[0] != "Bearer" {
+				writeError(w, http.StatusUnauthorized, "UNAUTHORIZED", "invalid bearer token format")
 				return
 			}
 
-			next.ServeHTTP(w, r)
+			tokenString := parts[1]
+			token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+				return secretKey, nil
+			})
+
+			if err != nil || !token.Valid {
+				writeError(w, http.StatusUnauthorized, "UNAUTHORIZED", "invalid token")
+				return
+			}
+
+			// Add the user ID to context
+			if claims, ok := token.Claims.(jwt.MapClaims); ok {
+				ctx := context.WithValue(r.Context(), "userID", claims["sub"])
+				next.ServeHTTP(w, r.WithContext(ctx))
+			} else {
+				writeError(w, http.StatusUnauthorized, "UNAUTHORIZED", "invalid token claims")
+			}
 		})
 	}
 }

@@ -10,6 +10,8 @@ import (
 
 	"github.com/Zubimendi/splitstack/internal/ledger"
 	"github.com/Zubimendi/splitstack/internal/observability"
+	"github.com/golang-jwt/jwt/v5"
+	"time"
 )
 
 type Handlers struct {
@@ -23,16 +25,47 @@ func NewHandlers(engine *ledger.Engine, log *zap.Logger) *Handlers {
 
 func (h *Handlers) CreateUser(w http.ResponseWriter, r *http.Request) {
 	var req createUserRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil || req.Name == "" || req.Email == "" {
-		writeError(w, http.StatusBadRequest, "INVALID_BODY", "name and email are required")
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil || req.Name == "" || req.Email == "" || req.Password == "" {
+		writeError(w, http.StatusBadRequest, "INVALID_BODY", "name, email, and password are required")
 		return
 	}
-	user, err := h.engine.CreateUser(r.Context(), req.Name, req.Email)
+	user, err := h.engine.CreateUser(r.Context(), req.Name, req.Email, req.Password)
 	if err != nil {
 		writeError(w, http.StatusConflict, "CREATE_FAILED", "failed to create user (email may already be in use)")
 		return
 	}
 	writeJSON(w, http.StatusCreated, user)
+}
+
+func (h *Handlers) Login(w http.ResponseWriter, r *http.Request) {
+	var req loginRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil || req.Email == "" || req.Password == "" {
+		writeError(w, http.StatusBadRequest, "INVALID_BODY", "email and password are required")
+		return
+	}
+	
+	user, err := h.engine.VerifyLogin(r.Context(), req.Email, req.Password)
+	if err != nil {
+		writeError(w, http.StatusUnauthorized, "UNAUTHORIZED", "invalid credentials")
+		return
+	}
+
+	// Secret should come from config in a real app, hardcoding here for MVP
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"sub": user.ID,
+		"exp": time.Now().Add(24 * time.Hour).Unix(),
+	})
+
+	tokenString, err := token.SignedString([]byte("dev-secret-key"))
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, "INTERNAL_ERROR", "could not generate token")
+		return
+	}
+
+	writeJSON(w, http.StatusOK, map[string]interface{}{
+		"token": tokenString,
+		"user":  user,
+	})
 }
 
 func (h *Handlers) GetUsers(w http.ResponseWriter, r *http.Request) {

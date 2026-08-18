@@ -12,6 +12,7 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"go.uber.org/zap"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type Engine struct {
@@ -23,14 +24,34 @@ func NewEngine(db *pgxpool.Pool, log *zap.Logger) *Engine {
 	return &Engine{db: db, log: log}
 }
 
-func (e *Engine) CreateUser(ctx context.Context, name, email string) (User, error) {
-	var u User
-	err := e.db.QueryRow(ctx, `
-		INSERT INTO users (name, email) VALUES ($1, $2)
-		RETURNING id, name, email
-	`, name, email).Scan(&u.ID, &u.Name, &u.Email)
+func (e *Engine) CreateUser(ctx context.Context, name, email, password string) (User, error) {
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		return User{}, err
+	}
+	var u User
+	err = e.db.QueryRow(ctx, `
+		INSERT INTO users (name, email, password_hash) VALUES ($1, $2, $3)
+		RETURNING id, name, email
+	`, name, email, string(hash)).Scan(&u.ID, &u.Name, &u.Email)
+	if err != nil {
+		return User{}, err
+	}
+	return u, nil
+}
+
+func (e *Engine) VerifyLogin(ctx context.Context, email, password string) (User, error) {
+	var u User
+	var hash string
+	err := e.db.QueryRow(ctx, `SELECT id, name, email, password_hash FROM users WHERE email = $1`, email).Scan(&u.ID, &u.Name, &u.Email, &hash)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return User{}, ErrNotFound
+		}
+		return User{}, err
+	}
+	if err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password)); err != nil {
+		return User{}, errors.New("invalid password")
 	}
 	return u, nil
 }
@@ -182,6 +203,10 @@ func (e *Engine) AddExpense(ctx context.Context, input AddExpenseInput) (Expense
 		return Expense{}, ErrNotFound
 	}
 
+	if !members[input.PaidByUserID] {
+		return Expense{}, ErrNotGroupMember
+	}
+
 	if len(input.Splits) == 0 {
 		input.Splits = splitEvenly(input.TotalCents, memberIDs)
 	} else {
@@ -285,6 +310,9 @@ func (e *Engine) updateBalance(ctx context.Context, tx pgx.Tx, groupID, userID s
 	var currentBalance int64
 	err := tx.QueryRow(ctx, `SELECT net_balance_cents, version FROM group_balances WHERE group_id = $1 AND user_id = $2`, groupID, userID).Scan(&currentBalance, &currentVersion)
 	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return ErrNotGroupMember
+		}
 		return err
 	}
 

@@ -10,12 +10,11 @@
 			"request": {
 				"method": "POST",
 				"header": [
-					{ "key": "Authorization", "value": "Bearer dev-secret-key" },
 					{ "key": "Content-Type", "value": "application/json" }
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"name\": \"Alice\",\n    \"email\": \"alice@example.com\"\n}"
+					"raw": "{\n    \"name\": \"Alice\",\n    \"email\": \"alice@example.com\",\n    \"password\": \"password123\"\n}"
 				},
 				"url": {
 					"raw": "http://localhost:8080/users",
@@ -27,11 +26,31 @@
 			}
 		},
 		{
+			"name": "Login",
+			"request": {
+				"method": "POST",
+				"header": [
+					{ "key": "Content-Type", "value": "application/json" }
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"alice@example.com\",\n    \"password\": \"password123\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/login",
+					"protocol": "http",
+					"host": [ "localhost" ],
+					"port": "8080",
+					"path": [ "login" ]
+				}
+			}
+		},
+		{
 			"name": "Get Users",
 			"request": {
 				"method": "GET",
 				"header": [
-					{ "key": "Authorization", "value": "Bearer dev-secret-key" }
+					{ "key": "Authorization", "value": "Bearer {{jwt_token}}" }
 				],
 				"url": {
 					"raw": "http://localhost:8080/users",
@@ -47,7 +66,7 @@
 			"request": {
 				"method": "GET",
 				"header": [
-					{ "key": "Authorization", "value": "Bearer dev-secret-key" }
+					{ "key": "Authorization", "value": "Bearer {{jwt_token}}" }
 				],
 				"url": {
 					"raw": "http://localhost:8080/users/{{user1_id}}",
@@ -63,7 +82,7 @@
 			"request": {
 				"method": "POST",
 				"header": [
-					{ "key": "Authorization", "value": "Bearer dev-secret-key" },
+					{ "key": "Authorization", "value": "Bearer {{jwt_token}}" },
 					{ "key": "Content-Type", "value": "application/json" }
 				],
 				"body": {
@@ -84,7 +103,7 @@
 			"request": {
 				"method": "GET",
 				"header": [
-					{ "key": "Authorization", "value": "Bearer dev-secret-key" }
+					{ "key": "Authorization", "value": "Bearer {{jwt_token}}" }
 				],
 				"url": {
 					"raw": "http://localhost:8080/groups",
@@ -100,7 +119,7 @@
 			"request": {
 				"method": "GET",
 				"header": [
-					{ "key": "Authorization", "value": "Bearer dev-secret-key" }
+					{ "key": "Authorization", "value": "Bearer {{jwt_token}}" }
 				],
 				"url": {
 					"raw": "http://localhost:8080/groups/{{group_id}}",
@@ -116,7 +135,7 @@
 			"request": {
 				"method": "POST",
 				"header": [
-					{ "key": "Authorization", "value": "Bearer dev-secret-key" },
+					{ "key": "Authorization", "value": "Bearer {{jwt_token}}" },
 					{ "key": "Content-Type", "value": "application/json" }
 				],
 				"body": {
@@ -137,7 +156,7 @@
 			"request": {
 				"method": "POST",
 				"header": [
-					{ "key": "Authorization", "value": "Bearer dev-secret-key" },
+					{ "key": "Authorization", "value": "Bearer {{jwt_token}}" },
 					{ "key": "Content-Type", "value": "application/json" }
 				],
 				"body": {
@@ -158,7 +177,7 @@
 			"request": {
 				"method": "GET",
 				"header": [
-					{ "key": "Authorization", "value": "Bearer dev-secret-key" }
+					{ "key": "Authorization", "value": "Bearer {{jwt_token}}" }
 				],
 				"url": {
 					"raw": "http://localhost:8080/groups/{{group_id}}/balances",
@@ -174,7 +193,7 @@
 			"request": {
 				"method": "GET",
 				"header": [
-					{ "key": "Authorization", "value": "Bearer dev-secret-key" }
+					{ "key": "Authorization", "value": "Bearer {{jwt_token}}" }
 				],
 				"url": {
 					"raw": "http://localhost:8080/groups/{{group_id}}/balances/verified",
@@ -190,7 +209,7 @@
 			"request": {
 				"method": "GET",
 				"header": [
-					{ "key": "Authorization", "value": "Bearer dev-secret-key" }
+					{ "key": "Authorization", "value": "Bearer {{jwt_token}}" }
 				],
 				"url": {
 					"raw": "http://localhost:8080/groups/{{group_id}}/settlement-plan",

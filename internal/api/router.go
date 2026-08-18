@@ -18,12 +18,13 @@ func NewRouter(h *Handlers, cfg config.Config) *chi.Mux {
 
 	// Public routes
 	r.Get("/metrics", observability.MetricsHandler().ServeHTTP)
+	r.Post("/users", h.CreateUser)
+	r.Post("/login", h.Login)
 
 	// Protected routes
 	r.Group(func(r chi.Router) {
-		r.Use(AuthMiddleware(cfg.APIKey))
+		r.Use(JWTAuthMiddleware([]byte("dev-secret-key")))
 
-		r.Post("/users", h.CreateUser)
 		r.Get("/users", h.GetUsers)
 		r.Get("/users/{userId}", h.GetUser)
 		
